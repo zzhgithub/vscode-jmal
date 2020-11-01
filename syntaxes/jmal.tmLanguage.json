@@ -3,29 +3,412 @@
   "name": "jmal",
   "patterns": [
     {
-      "include": "#keywords"
+      "include": "#comment"
     },
     {
-      "include": "#strings"
+      "include": "#quoted-sexp"
+    },
+    {
+      "include": "#sexp"
+    },
+    {
+      "include": "#keyfn"
+    },
+    {
+      "include": "#string"
+    },
+    {
+      "include": "#vector"
+    },
+    {
+      "include": "#set"
+    },
+    {
+      "include": "#map"
+    },
+    {
+      "include": "#regexp"
+    },
+    {
+      "include": "#var"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#dynamic-variables"
+    },
+    {
+      "include": "#metadata"
+    },
+    {
+      "include": "#namespace-symbol"
+    },
+    {
+      "include": "#symbol"
     }
   ],
   "repository": {
-    "keywords": {
+    "comment": {
+      "begin": "(;).*$\n?",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.comment.jmal"
+        }
+      },
+      "end": "$",
+      "name": "comment.line.semicolon.jmal"
+    },
+    "constants": {
       "patterns": [
         {
-          "name": "keyword.control.jmal",
-          "match": "\\b(if|while|for|return)\\b"
+          "match": "(nil)(?=(\\s|\\)|\\]|\\}))",
+          "name": "constant.language.nil.jmal"
+        },
+        {
+          "match": "(true|false)",
+          "name": "constant.language.boolean.jmal"
+        },
+        {
+          "match": "(-?\\d+/\\d+)",
+          "name": "constant.numeric.ratio.jmal"
+        },
+        {
+          "match": "(-?\\d+[rR]\\w+)",
+          "name": "constant.numeric.arbitrary-radix.jmal"
+        },
+        {
+          "match": "(-?0[xX][0-9a-fA-F]+)",
+          "name": "constant.numeric.hexadecimal.jmal"
+        },
+        {
+          "match": "(-?0\\d+)",
+          "name": "constant.numeric.octal.jmal"
+        },
+        {
+          "match": "(-?\\d+\\.\\d+([eE][+-]?\\d+)?M)",
+          "name": "constant.numeric.bigdecimal.jmal"
+        },
+        {
+          "match": "(-?\\d+\\.\\d+([eE][+-]?\\d+)?)",
+          "name": "constant.numeric.double.jmal"
+        },
+        {
+          "match": "(-?\\d+N)",
+          "name": "constant.numeric.bigint.jmal"
+        },
+        {
+          "match": "(-?\\d+)",
+          "name": "constant.numeric.long.jmal"
+        },
+        {
+          "include": "#keyword"
         }
       ]
     },
-    "strings": {
-      "name": "string.quoted.double.jmal",
-      "begin": "\"",
-      "end": "\"",
+    "keyword": {
+      "match": "(?<=(\\s|\\(|\\[|\\{)):[\\w\\#\\.\\-\\_\\:\\+\\=\\>\\<\\/\\!\\?\\*]+(?=(\\s|\\)|\\]|\\}|\\,))",
+      "name": "constant.keyword.jmal"
+    },
+    "keyfn": {
       "patterns": [
         {
-          "name": "constant.character.escape.jmal",
-          "match": "\\\\."
+          "match": "(?<=(\\s|\\(|\\[|\\{))(if(-[-\\p{Ll}\\?]*)?|when(-[-\\p{Ll}]*)?|for(-[-\\p{Ll}]*)?|cond|do|let(-[-\\p{Ll}\\?]*)?|binding|loop|recur|fn|throw[\\p{Ll}\\-]*|try|catch|finally|([\\p{Ll}]*case))(?=(\\s|\\)|\\]|\\}))",
+          "name": "storage.control.jmal"
+        },
+        {
+          "match": "(?<=(\\s|\\(|\\[|\\{))(declare-?|(in-)?ns|import|use|require|load|compile|(def[\\p{Ll}\\-]*))(?=(\\s|\\)|\\]|\\}))",
+          "name": "keyword.control.jmal"
+        }
+      ]
+    },
+    "dynamic-variables": {
+      "match": "\\*[\\w\\.\\-\\_\\:\\+\\=\\>\\<\\!\\?\\d]+\\*",
+      "name": "meta.symbol.dynamic.jmal"
+    },
+    "map": {
+      "begin": "(\\{)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.section.map.begin.jmal"
+        }
+      },
+      "end": "(\\}(?=[\\}\\]\\)\\s]*(?:;|$)))|(\\})",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.section.map.end.trailing.jmal"
+        },
+        "2": {
+          "name": "punctuation.section.map.end.jmal"
+        }
+      },
+      "name": "meta.map.jmal",
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    "metadata": {
+      "patterns": [
+        {
+          "begin": "(\\^\\{)",
+          "beginCaptures": {
+            "1": {
+              "name": "punctuation.section.metadata.map.begin.jmal"
+            }
+          },
+          "end": "(\\}(?=[\\}\\]\\)\\s]*(?:;|$)))|(\\})",
+          "endCaptures": {
+            "1": {
+              "name": "punctuation.section.metadata.map.end.trailing.jmal"
+            },
+            "2": {
+              "name": "punctuation.section.metadata.map.end.jmal"
+            }
+          },
+          "name": "meta.metadata.map.jmal",
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "begin": "(\\^)",
+          "end": "(\\s)",
+          "name": "meta.metadata.simple.jmal",
+          "patterns": [
+            {
+              "include": "#keyword"
+            },
+            {
+              "include": "$self"
+            }
+          ]
+        }
+      ]
+    },
+    "quoted-sexp": {
+      "begin": "(['``]\\()",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.section.expression.begin.jmal"
+        }
+      },
+      "end": "(\\))$|(\\)(?=[\\}\\]\\)\\s]*(?:;|$)))|(\\))",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.section.expression.end.trailing.jmal"
+        },
+        "2": {
+          "name": "punctuation.section.expression.end.trailing.jmal"
+        },
+        "3": {
+          "name": "punctuation.section.expression.end.jmal"
+        }
+      },
+      "name": "meta.quoted-expression.jmal",
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    "regexp": {
+      "begin": "#\"",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.definition.regexp.begin.jmal"
+        }
+      },
+      "end": "\"",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.definition.regexp.end.jmal"
+        }
+      },
+      "name": "string.regexp.jmal",
+      "patterns": [
+        {
+          "include": "#regexp_escaped_char"
+        }
+      ]
+    },
+    "regexp_escaped_char": {
+      "match": "\\\\.",
+      "name": "constant.character.escape.jmal"
+    },
+    "set": {
+      "begin": "(\\#\\{)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.section.set.begin.jmal"
+        }
+      },
+      "end": "(\\}(?=[\\}\\]\\)\\s]*(?:;|$)))|(\\})",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.section.set.end.trailing.jmal"
+        },
+        "2": {
+          "name": "punctuation.section.set.end.jmal"
+        }
+      },
+      "name": "meta.set.jmal",
+      "patterns": [
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    "sexp": {
+      "begin": "(\\()",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.section.expression.begin.jmal"
+        }
+      },
+      "end": "(\\))$|(\\)(?=[\\}\\]\\)\\s]*(?:;|$)))|(\\))",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.section.expression.end.trailing.jmal"
+        },
+        "2": {
+          "name": "punctuation.section.expression.end.trailing.jmal"
+        },
+        "3": {
+          "name": "punctuation.section.expression.end.jmal"
+        }
+      },
+      "name": "meta.expression.jmal",
+      "patterns": [
+        {
+          "begin": "(?<=\\()(ns|declare|def[\\w\\d._:+=><!?*-]*|[\\w._:+=><!?*-][\\w\\d._:+=><!?*-]*/def[\\w\\d._:+=><!?*-]*)\\s+",
+          "beginCaptures": {
+            "1": {
+              "name": "keyword.control.jmal"
+            }
+          },
+          "end": "(?=\\))",
+          "name": "meta.definition.global.jmal",
+          "patterns": [
+            {
+              "include": "#metadata"
+            },
+            {
+              "include": "#dynamic-variables"
+            },
+            {
+              "match": "([\\p{L}\\.\\-\\_\\+\\=\\>\\<\\!\\?\\*][\\w\\.\\-\\_\\:\\+\\=\\>\\<\\!\\?\\*\\d]*)",
+              "name": "entity.global.jmal"
+            },
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "include": "#keyfn"
+        },
+        {
+          "include": "#constants"
+        },
+        {
+          "include": "#vector"
+        },
+        {
+          "include": "#map"
+        },
+        {
+          "include": "#set"
+        },
+        {
+          "include": "#sexp"
+        },
+        {
+          "match": "(?<=\\()(.+?)(?=\\s|\\))",
+          "captures": {
+            "1": {
+              "name": "entity.name.function.jmal"
+            }
+          },
+          "patterns": [
+            {
+              "include": "$self"
+            }
+          ]
+        },
+        {
+          "include": "$self"
+        }
+      ]
+    },
+    "string": {
+      "begin": "(?<!\\\\)(\")",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.string.begin.jmal"
+        }
+      },
+      "end": "(\")",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.definition.string.end.jmal"
+        }
+      },
+      "name": "string.quoted.double.jmal",
+      "patterns": [
+        {
+          "match": "\\\\.",
+          "name": "constant.character.escape.jmal"
+        }
+      ]
+    },
+    "namespace-symbol": {
+      "patterns": [
+        {
+          "match": "([\\p{L}\\.\\-\\_\\+\\=\\>\\<\\!\\?\\*][\\w\\.\\-\\_\\:\\+\\=\\>\\<\\!\\?\\*\\d]*)/",
+          "captures": {
+            "1": {
+              "name": "meta.symbol.namespace.jmal"
+            }
+          }
+        }
+      ]
+    },
+    "symbol": {
+      "patterns": [
+        {
+          "match": "([\\p{L}\\.\\-\\_\\+\\=\\>\\<\\!\\?\\*][\\w\\.\\-\\_\\:\\+\\=\\>\\<\\!\\?\\*\\d]*)",
+          "name": "meta.symbol.jmal"
+        }
+      ]
+    },
+    "var": {
+      "match": "(?<=(\\s|\\(|\\[|\\{)\\#)'[\\w\\.\\-\\_\\:\\+\\=\\>\\<\\/\\!\\?\\*]+(?=(\\s|\\)|\\]|\\}))",
+      "name": "meta.var.jmal"
+    },
+    "vector": {
+      "begin": "(\\[)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.section.vector.begin.jmal"
+        }
+      },
+      "end": "(\\](?=[\\}\\]\\)\\s]*(?:;|$)))|(\\])",
+      "endCaptures": {
+        "1": {
+          "name": "punctuation.section.vector.end.trailing.jmal"
+        },
+        "2": {
+          "name": "punctuation.section.vector.end.jmal"
+        }
+      },
+      "name": "meta.vector.jmal",
+      "patterns": [
+        {
+          "include": "$self"
         }
       ]
     }

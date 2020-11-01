@@ -1,25 +1,34 @@
 {
-    "name": "jmal",
-    "displayName": "jmal",
-    "description": "make a lisp On Juner OS",
-    "version": "0.0.1",
-    "engines": {
-        "vscode": "^1.50.0"
-    },
-    "categories": [
-        "Programming Languages"
+  "name": "jmal",
+  "displayName": "jmal",
+  "description": "make a lisp On Juner OS",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.50.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "jmal",
+        "aliases": [
+          "jmal",
+          "jmal"
+        ],
+        "extensions": [
+          ".jmal"
+        ],
+        "configuration": "./language-configuration.json"
+      }
     ],
-    "contributes": {
-        "languages": [{
-            "id": "jmal",
-            "aliases": ["jmal", "jmal"],
-            "extensions": [".jmal"],
-            "configuration": "./language-configuration.json"
-        }],
-        "grammars": [{
-            "language": "jmal",
-            "scopeName": "source.jmal",
-            "path": "./syntaxes/jmal.tmLanguage.json"
-        }]
-    }
+    "grammars": [
+      {
+        "language": "jmal",
+        "scopeName": "source.jmal",
+        "path": "./syntaxes/jmal.tmLanguage.json"
+      }
+    ]
+  }
 }

@@ -3,6 +3,7 @@
   "displayName": "jmal",
   "description": "make a lisp On Juner OS",
   "version": "0.0.1",
+  "publisher": "zhouzihaoJ",
   "engines": {
     "vscode": "^1.50.0"
   },
